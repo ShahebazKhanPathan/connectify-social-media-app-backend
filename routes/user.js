@@ -5,7 +5,7 @@ const Joi = require('joi');
 const passwordComplexity = require('joi-password-complexity');
 const User = require('../models/user');
 
-router.post("/", async(req, res) => {
+router.post("/", async(req, res, next) => {
     
     // Validate user
     const { error } = validateUser(req.body);
@@ -19,12 +19,16 @@ router.post("/", async(req, res) => {
     // Check password complexity
     const complexity = passwordComplexity().validate(password);
     if (complexity.error) return res.status(400).send('Password must contain at least 1 upper case letter, 1 lower case letter, 1 number, and 1 symbol.');
-    return res.status(200).send('OK');
 
     // Add user to database
     const newUser = new User(req.body);
-    const result = await newUser.save();
-    res.status(201).send(result);
+    try {
+        const result = await newUser.save();
+        res.status(201).send(result);
+    }
+    catch (err) {
+        next(err);
+    }
 });
 
 function validateUser(user) {
