@@ -1,5 +1,6 @@
 {
     "adminConfig": {
         "dbHost": "MONGO_URI"
-    }
+    },
+    "privateKey": "PRIVATE_KEY"
 }

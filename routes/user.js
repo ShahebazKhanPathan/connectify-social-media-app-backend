@@ -1,6 +1,8 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const config = require('config');
 const router = express.Router();
 const Joi = require('joi');
 const passwordComplexity = require('joi-password-complexity');
@@ -29,7 +31,10 @@ router.post("/", async (req, res, next) => {
         // Add user to database
         const newUser = new User({...data, password: hashedPassword });
         const result = await newUser.save();
-        res.status(201).send(result);
+
+        // Create token
+        const token = jwt.sign({ id: result._id }, config.get("privateKey"));
+        res.status(201).send(token);
     }
     catch (err) {
         next(err);
