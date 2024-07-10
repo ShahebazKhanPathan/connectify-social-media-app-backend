@@ -22,8 +22,9 @@ const userSchema = new mongoose.Schema({
     password: {
         required: true,
         type: String,
-        minlength: 8,
+        minlength: 8
     }
 });
 
 const User = mongoose.model("User", userSchema);
+module.exports = User;
