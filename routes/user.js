@@ -8,8 +8,9 @@ const Joi = require('joi');
 const passwordComplexity = require('joi-password-complexity');
 const User = require('../models/user');
 
-router.post("/", async (req, res, next) => {
+router.post("/signup", async (req, res, next) => {
     const data = req.body;
+
     try {
         // Validate user
         const { error } = validateUser(data);
@@ -35,6 +36,21 @@ router.post("/", async (req, res, next) => {
         // Create token
         const token = jwt.sign({ id: result._id }, config.get("privateKey"));
         res.status(201).send(token);
+    }
+    catch (err) {
+        next(err);
+    }
+});
+
+router.post("/signin", async (req, res, next) => {
+    const { id, password } = req.body;
+    try {
+        // Authenticate user
+        const user = await User.findOne().or([{ email: id }, { mobile: id }]);
+        if (!user) return res.status(404).send("Id or password is invalid.");
+        const result = await bcrypt.compare(password, user.password);
+        if(!result) return res.status(404).send("Id or mobile is invalid.");
+        res.send(result);
     }
     catch (err) {
         next(err);
